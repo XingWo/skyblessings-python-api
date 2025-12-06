@@ -25,7 +25,6 @@ class BlessingResult:
     """抽签结果"""
     background_image: str = ""  # 背景装饰图文件名
     text_image: str = ""  # 签文图片文件名
-    text_label: str = ""  # 签文
     dordas: str = ""  # 结缘物
     dordas_color: str = ""  # 缘彩名称
     color_hex: str = ""  # 颜色十六进制
@@ -123,7 +122,6 @@ class BlessingRenderer:
         text_items = [item for item in text_items if item.remark == "textimg"]
         text_item = self._draw_random_item(text_items)
         result.text_image = TEXT_IMAGE_MAP.get(text_item.name, "")
-        result.text_label = text_item.name
         
         # 3. 递归抽取下级项
         self._draw_sub_items(text_item.id, result)
@@ -138,12 +136,13 @@ class BlessingRenderer:
         b = int(hex_color[4:6], 16)
         return (r, g, b, alpha)
     
-    def generate_blessing_image(self, debug: bool = False) -> bytes:
+    def generate_blessing_image(self, debug: bool = False, add_text_stroke: bool = False) -> bytes:
         """
         生成祈福签图片
         
         Args:
             debug: 是否打印调试信息
+            add_text_stroke: 是否添加文字描边
             
         Returns:
             PNG 图片字节流
@@ -171,7 +170,7 @@ class BlessingRenderer:
             self._draw_text_image(canvas, result.text_image)
         
         # 4. 绘制文字内容
-        self._draw_texts(canvas, result)
+        self._draw_texts(canvas, result, add_text_stroke=add_text_stroke)
         
         # 5. 转换为 PNG 字节流
         output = io.BytesIO()
@@ -235,7 +234,7 @@ class BlessingRenderer:
         except Exception as e:
             print(f"警告：加载签文图失败 {e}")
     
-    def _draw_texts(self, canvas: Image.Image, result: BlessingResult):
+    def _draw_texts(self, canvas: Image.Image, result: BlessingResult, add_text_stroke: bool = False):
         """绘制文字内容"""
         font_normal = self._load_font(size=40)  # 普通字体（40pt）
         font_blod = self._load_font(size=49)  # 稍大字体（49pt，用于祝福语）
@@ -243,6 +242,8 @@ class BlessingRenderer:
         
         # 文字颜色：白色
         text_color = (255, 255, 255, 255)
+        # 描边颜色：深灰色，半透明
+        stroke_color = (100, 100, 100, 80)
         
         # 准备文字内容（按顺序）
         texts = [
@@ -258,8 +259,8 @@ class BlessingRenderer:
         text_area_x = int(self.width * (1 - text_width_ratio)) - margin_right - 133  # 左移 133px，避免与签文图重叠
         
         # 垂直居中，逐行绘制
-        # 行间距：一二行靠近（+5），二三行分开（+25），三四行分开（+25）
-        line_spacings = [20, 60, 85]  # 每行之后的间距
+        # 行间距：一二行靠近，二三行分开（为祝福语留更多空间），三四行分开
+        line_spacings = [20, 60, 85]  # 每行之后的间距（祝福语前增加间距）
         
         # 计算总高度
         total_height = self.font_size * 3 + 32 + sum(line_spacings)  # 3行普通 + 1行大字 + 间距
@@ -271,6 +272,16 @@ class BlessingRenderer:
                 # 第三行（祝福语，索引2）使用大字体
                 current_font = font_blod if i == 2 else font_normal
                 
+                # 如果启用描边，先绘制描边效果
+                if add_text_stroke:
+                    # 祝福语使用更粗的描边，其他文字使用细描边
+                    if i == 2:  # 祝福语
+                        stroke_offsets = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+                    else:
+                        stroke_offsets = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+                    
+                    for offset_x, offset_y in stroke_offsets:
+                        draw.text((text_area_x + offset_x, current_y + offset_y), text, font=current_font, fill=stroke_color)
                 
                 # 绘制主文字（白色）
                 draw.text((text_area_x, current_y), text, font=current_font, fill=text_color)

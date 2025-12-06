@@ -82,7 +82,7 @@ async def index():
 
 
 @app.get("/blessing")
-async def get_blessing():
+async def get_blessing(add_text_stroke: bool = False):
     """
     获取随机祈福签图片
     
@@ -90,7 +90,7 @@ async def get_blessing():
         PNG 图片
     """
     try:
-        image_bytes = renderer.generate_blessing_image(debug=debug_mode)
+        image_bytes = renderer.generate_blessing_image(debug=debug_mode, add_text_stroke=add_text_stroke)
         return Response(content=image_bytes, media_type="image/png")
     except Exception as e:
         print(f"错误：生成图片失败 {e}")
@@ -119,8 +119,9 @@ if __name__ == "__main__":
     port = config["server"]["port"]
     
     print(f"🚀 启动祈福签 API 服务...")
-    print(f"📍 地址: http://{host}:{port}")
+    print(f"📍 跟路由: http://{host}:{port}")
     print(f"📖 API 文档: http://{host}:{port}/docs")
+    print(f"🔖 抽签图片: http://{host}:{port}/blessing")
     print(f"🐛 调试模式: {'开启' if debug_mode else '关闭'}")
     print()
     
