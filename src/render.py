@@ -25,6 +25,7 @@ class BlessingResult:
     """抽签结果"""
     background_image: str = ""  # 背景装饰图文件名
     text_image: str = ""  # 签文图片文件名
+    text_label: str = ""  # 签文
     dordas: str = ""  # 结缘物
     dordas_color: str = ""  # 缘彩名称
     color_hex: str = ""  # 颜色十六进制
@@ -122,6 +123,7 @@ class BlessingRenderer:
         text_items = [item for item in text_items if item.remark == "textimg"]
         text_item = self._draw_random_item(text_items)
         result.text_image = TEXT_IMAGE_MAP.get(text_item.name, "")
+        result.text_label = text_item.name
         
         # 3. 递归抽取下级项
         self._draw_sub_items(text_item.id, result)
