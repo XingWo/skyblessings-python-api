@@ -35,7 +35,7 @@ pip install -r ./requirements.txt
 ```
 
 ### 2. 配置文件
-assets_dir可能需要替换为具体assets地址
+
 编辑 `config.toml`:
 
 ```toml
@@ -48,7 +48,7 @@ log_level = "debug"  # "info" 或 "debug"
 width = 1240
 height = 620
 font_size = 40
-assets_dir = "../assets"
+assets_dir = "../assets"  # assets_dir可能需要替换为具体assets地址
 ```
 
 ### 3. 运行服务
