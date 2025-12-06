@@ -153,7 +153,7 @@ class BlessingRenderer:
         
         if debug:
             print("--- 抽签结果 ---")
-            print(f"抽中:  {result.text_label}；{result.dordas}；{result.dordas_color}；{result.blessing}{result.entry}")
+            print(f"抽中:  {result.text_label}；{result.dordas}；{result.dordas_color}；{result.blessing} {result.entry}")
             print("-" * 26)
         
         # 创建画布
