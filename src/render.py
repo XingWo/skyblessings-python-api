@@ -237,8 +237,8 @@ class BlessingRenderer:
     
     def _draw_texts(self, canvas: Image.Image, result: BlessingResult):
         """绘制文字内容"""
-        font_normal = self._load_font(size=40)  # 普通字体（36pt）
-        font_blod = self._load_font(size=45)  # 稍小字体（32pt，用于祝福语）
+        font_normal = self._load_font(size=40)  # 普通字体（40pt）
+        font_blod = self._load_font(size=49)  # 稍大字体（49pt，用于祝福语）
         draw = ImageDraw.Draw(canvas)
         
         # 文字颜色：白色
