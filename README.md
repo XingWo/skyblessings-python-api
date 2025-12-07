@@ -114,6 +114,16 @@ skyblessings-fastapi-pillow/
   "endpoints": {
     "/": "API 信息",
     "/blessing": "获取随机祈福签图片（PNG）"
+  },"blessing_image_and_text":{
+    "background_image":"background2.png",
+    "text_image":"text2.png",
+    "text_label":"小吉",
+    "dordas":"结缘物：鱼",
+    "dordas_color":"缘彩：竹月",
+    "color_hex":"#7d99a9",
+    "blessing":"伞一直在，记得避雨。",
+    "entry":"忌：口是心非",
+    "image_base64":"......"
   }
 }
 ```

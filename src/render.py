@@ -138,7 +138,7 @@ class BlessingRenderer:
         b = int(hex_color[4:6], 16)
         return (r, g, b, alpha)
     
-    def generate_blessing_image(self, debug: bool = False, add_text_stroke: bool = False) -> bytes:
+    def generate_blessing_image(self, debug: bool = False, add_text_stroke: bool = False) -> Tuple[bytes, BlessingResult]:
         """
         生成祈福签图片
         
@@ -147,7 +147,7 @@ class BlessingRenderer:
             add_text_stroke: 是否添加文字描边
             
         Returns:
-            PNG 图片字节流
+            PNG 图片字节流, 抽签结果对象
         """
         # 执行抽签
         result = self.perform_draw()
@@ -178,7 +178,7 @@ class BlessingRenderer:
         output = io.BytesIO()
         canvas.save(output, format='PNG')
         output.seek(0)
-        return output.getvalue()
+        return output.getvalue(), result
     
     def _draw_background_decoration(self, canvas: Image.Image, decoration_filename: str):
         """
@@ -190,9 +190,6 @@ class BlessingRenderer:
             canvas.alpha_composite(base_texture)
         except Exception as e:
             print(f"警告：绘制装饰层失败 {e}")
-
-
-
 
     
     def _draw_colored_background(self, canvas: Image.Image, color_hex: str):
@@ -277,10 +274,7 @@ class BlessingRenderer:
                 # 如果启用描边，先绘制描边效果
                 if add_text_stroke:
                     # 祝福语使用更粗的描边，其他文字使用细描边
-                    if i == 2:  # 祝福语
-                        stroke_offsets = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
-                    else:
-                        stroke_offsets = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+                    stroke_offsets = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
                     
                     for offset_x, offset_y in stroke_offsets:
                         draw.text((text_area_x + offset_x, current_y + offset_y), text, font=current_font, fill=stroke_color)

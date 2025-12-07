@@ -3,6 +3,7 @@ FastAPI 主应用
 """
 
 import toml
+import base64
 from pathlib import Path
 from typing import Optional
 
@@ -69,16 +70,43 @@ debug_mode = config["server"].get("log_level", "info").lower() == "debug"
 
 @app.get("/")
 async def index():
-    """根路径：返回 API 信息"""
-    return JSONResponse({
-        "name": "祈福签 API",
-        "version": "1.0.0",
-        "endpoints": {
-            "/": "API 信息",
-            "/blessing": "获取随机祈福签图片（PNG）",
-            "/favicon.ico": "网站图标"
+    """根路径：返回 API 信息 + 抽签结果 JSON（含 base64 图片）"""
+    try:
+        image_bytes, result = renderer.generate_blessing_image(debug=debug_mode)
+        
+        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+        
+        blessing_data = {
+            "background_image": result.background_image,
+            "text_image": result.text_image,
+            "text_label": result.text_label,
+            "dordas": result.dordas,
+            "dordas_color": result.dordas_color,
+            "color_hex": result.color_hex,
+            "blessing": result.blessing,
+            "entry": result.entry,
+            "image_base64": image_base64
         }
-    })
+        
+        response_data = {
+            "name": "祈福签 API",
+            "version": "1.0.0",
+            "endpoints": {
+                "/": "API 信息",
+                "/blessing": "获取随机祈福签图片（PNG）"
+            },
+            "blessing_image_and_text": blessing_data
+        }
+        
+        return JSONResponse(content=response_data)
+    except Exception as e:
+        print(f"错误：生成抽签结果失败 {e}")
+        import traceback
+        traceback.print_exc()
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"生成抽签结果失败: {str(e)}"}
+        )
 
 
 @app.get("/blessing")
@@ -90,7 +118,7 @@ async def get_blessing(add_text_stroke: bool = False):
         PNG 图片
     """
     try:
-        image_bytes = renderer.generate_blessing_image(debug=debug_mode, add_text_stroke=add_text_stroke)
+        image_bytes, _ = renderer.generate_blessing_image(debug=debug_mode, add_text_stroke=add_text_stroke)
         return Response(content=image_bytes, media_type="image/png")
     except Exception as e:
         print(f"错误：生成图片失败 {e}")
@@ -119,7 +147,7 @@ if __name__ == "__main__":
     port = config["server"]["port"]
     
     print(f"🚀 启动祈福签 API 服务...")
-    print(f"📍 跟路由: http://{host}:{port}")
+    print(f"📍 抽签JSON: http://{host}:{port}")
     print(f"📖 API 文档: http://{host}:{port}/docs")
     print(f"🔖 抽签图片: http://{host}:{port}/blessing")
     print(f"🐛 调试模式: {'开启' if debug_mode else '关闭'}")
