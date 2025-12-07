@@ -2,7 +2,9 @@
 
 
 原始项目地址： https://github.com/XingWo/skyblessings
+
 光遇祈福签 API - Python 版本：https://github.com/XingWo/skyblessings-python-api
+
 光遇祈福签 API - Go 版本：https://github.com/XingWo/skyblessings-go-api
 
 基于 FastAPI + Pillow 实现的sky祈福签图片生成 API
