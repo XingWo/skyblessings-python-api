@@ -110,7 +110,7 @@ async def index():
 
 
 @app.get("/blessing")
-async def get_blessing(star: Optional[str] = None, add_text_stroke: bool = False):
+async def get_blessing(starwo: Optional[str] = None, add_text_stroke: bool = False):
     """
     获取随机祈福签图片
     
@@ -118,7 +118,7 @@ async def get_blessing(star: Optional[str] = None, add_text_stroke: bool = False
         PNG 图片
     """
     try:
-        force_odd = star is not None
+        force_odd = starwo is not None
         
         image_bytes, _ = renderer.generate_blessing_image(debug=debug_mode, add_text_stroke=add_text_stroke, force_odd=force_odd)
         return Response(content=image_bytes, media_type="image/png")
