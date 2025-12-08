@@ -107,19 +107,19 @@ class BlessingRenderer:
         # 继续递归
         self._draw_sub_items(selected.id, result)
     
-    def perform_draw(self) -> BlessingResult:
+    def perform_draw(self, force_odd: bool = False) -> BlessingResult:
         """执行抽签"""
         result = BlessingResult()
-        
         # 1. 抽取背景图
         bg_items = [item for item in DRAW_ITEMS if item.remark == "backgroundimg"]
+        if force_odd:
+            bg_items = [item for item in DRAW_ITEMS if item.remark == "backgroundimg" and item.id == "9"]
         bg_item = self._draw_random_item(bg_items)
         result.background_image = BACKGROUND_IMAGE_MAP.get(bg_item.name, "")
         
+        
         # 2. 抽取签文类型
-        text_items = self._get_children("0")
-        if not text_items:
-            text_items = self._get_children("9")  # 奇签
+        text_items = self._get_children(bg_item.id)
         text_items = [item for item in text_items if item.remark == "textimg"]
         text_item = self._draw_random_item(text_items)
         result.text_image = TEXT_IMAGE_MAP.get(text_item.name, "")
@@ -138,7 +138,7 @@ class BlessingRenderer:
         b = int(hex_color[4:6], 16)
         return (r, g, b, alpha)
     
-    def generate_blessing_image(self, debug: bool = False, add_text_stroke: bool = False) -> Tuple[bytes, BlessingResult]:
+    def generate_blessing_image(self, debug: bool = False, add_text_stroke: bool = False, force_odd: bool = False) -> Tuple[bytes, BlessingResult]:
         """
         生成祈福签图片
         
@@ -150,7 +150,7 @@ class BlessingRenderer:
             PNG 图片字节流, 抽签结果对象
         """
         # 执行抽签
-        result = self.perform_draw()
+        result = self.perform_draw(force_odd=force_odd)
         
         if debug:
             print("--- 抽签结果 ---")
