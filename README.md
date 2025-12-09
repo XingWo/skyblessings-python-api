@@ -1,5 +1,6 @@
 # 光遇祈福签 API - Python 版本
 
+## python版细节更还原，逻辑更准确，go版相应更快，延迟更小
 
 原始项目地址： https://github.com/XingWo/skyblessings
 
