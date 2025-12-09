@@ -93,12 +93,14 @@ async def index(starwo: Optional[str] = None):
         }
 
         response_data = {
-            "name": "祈福签 API",
+            "message": "祈福签 API",
             "version": "1.0.0",
             "endpoints": {
                 "/": "API 信息",
                 "/blessing": "获取随机祈福签图片（PNG）"
             },
+            "author":"哔哩哔哩——星沃",
+            "collaborator":"VincentZyu",
             "blessing_image_and_text": blessing_data
         }
 
