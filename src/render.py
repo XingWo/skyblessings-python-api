@@ -84,14 +84,20 @@ class BlessingRenderer:
                 return item
         
         return items[-1]  # 兜底返回最后一项
-    
+
     def _draw_sub_items(self, parent_id: str, result: BlessingResult):
         """递归抽取子项"""
         children = self._get_children(parent_id)
         if not children:
             return
         
-        selected = self._draw_random_item(children)
+        # 根据权重洗牌子项
+        weighted_indices = self.shuffle_weighted_items(children)
+        
+        # 随机选择一个加权索引对应的项
+        selected_index = weighted_indices[random.randint(0, len(weighted_indices) - 1)]
+    
+        selected = children[selected_index]
         
         # 根据类型填充结果
         if selected.remark == "dordas":
@@ -106,6 +112,18 @@ class BlessingRenderer:
         
         # 继续递归
         self._draw_sub_items(selected.id, result)
+
+    def shuffle_weighted_items(self, items):
+        """根据权重创建索引列表并洗牌"""
+        weighted_indices = []
+        
+        # 按照每个项的权重生成加权的索引列表
+        for idx, item in enumerate(items):
+            weighted_indices.extend([idx] * item.weight)  # 每个索引重复 item.weight 次
+        
+        # 对加权索引进行洗牌
+        random.shuffle(weighted_indices)
+        return weighted_indices
     
     def perform_draw(self, force_odd: bool = False) -> BlessingResult:
         """执行抽签"""

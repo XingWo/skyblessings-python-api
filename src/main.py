@@ -67,15 +67,19 @@ renderer = BlessingRenderer(config)
 # 获取调试模式
 debug_mode = config["server"].get("log_level", "info").lower() == "debug"
 
-
 @app.get("/")
-async def index():
+async def index(starwo: Optional[str] = None):
     """根路径：返回 API 信息 + 抽签结果 JSON（含 base64 图片）"""
     try:
-        image_bytes, result = renderer.generate_blessing_image(debug=debug_mode)
-        
-        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
-        
+        force_odd = starwo is not None
+
+        image_bytes, result = renderer.generate_blessing_image(
+            debug=debug_mode,
+            force_odd=force_odd
+        )
+
+        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+
         blessing_data = {
             "background_image": result.background_image,
             "text_image": result.text_image,
@@ -87,7 +91,7 @@ async def index():
             "entry": result.entry,
             "image_base64": image_base64
         }
-        
+
         response_data = {
             "name": "祈福签 API",
             "version": "1.0.0",
@@ -97,8 +101,9 @@ async def index():
             },
             "blessing_image_and_text": blessing_data
         }
-        
+
         return JSONResponse(content=response_data)
+
     except Exception as e:
         print(f"错误：生成抽签结果失败 {e}")
         import traceback
@@ -107,7 +112,6 @@ async def index():
             status_code=500,
             content={"error": f"生成抽签结果失败: {str(e)}"}
         )
-
 
 @app.get("/blessing")
 async def get_blessing(starwo: Optional[str] = None, add_text_stroke: bool = False):
