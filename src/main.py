@@ -68,6 +68,22 @@ renderer = BlessingRenderer(config)
 debug_mode = config["server"].get("log_level", "info").lower() == "debug"
 
 @app.get("/")
+async def index():
+    """根路径：返回 API 信息"""
+    return JSONResponse({
+        "name": "祈福签 API",
+        "version": "1.0.0",
+        "endpoints": {
+            "/": "API 信息",
+            "/json": "获取随机祈福签图片（JSON）",
+            "/blessing": "获取随机祈福签图片（PNG）",
+            "/favicon.ico": "作者头像",
+            "author":"哔哩哔哩——星沃",
+            "collaborator":"VincentZyu",
+        }
+    })
+
+@app.get("/json")
 async def index(starwo: Optional[str] = None):
     """根路径：返回 API 信息 + 抽签结果 JSON（含 base64 图片）"""
     try:
@@ -93,12 +109,6 @@ async def index(starwo: Optional[str] = None):
         }
 
         response_data = {
-            "message": "祈福签 API",
-            "version": "1.0.0",
-            "endpoints": {
-                "/": "API 信息",
-                "/blessing": "获取随机祈福签图片（PNG）"
-            },
             "author":"哔哩哔哩——星沃",
             "collaborator":"VincentZyu",
             "blessing_image_and_text": blessing_data
@@ -155,8 +165,8 @@ if __name__ == "__main__":
     port = config["server"]["port"]
     
     print(f"🚀 启动祈福签 API 服务...")
-    print(f"📍 抽签JSON: http://{host}:{port}")
-    print(f"📖 API 文档: http://{host}:{port}/docs")
+    print(f"📍 地址: http://{host}:{port}")
+    print(f"📖 抽签JSON: http://{host}:{port}/json")
     print(f"🔖 抽签图片: http://{host}:{port}/blessing")
     print(f"🐛 调试模式: {'开启' if debug_mode else '关闭'}")
     print()
